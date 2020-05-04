@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,15 +11,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.vatsalyadav.uploadimage.R;
-import com.vatsalyadav.uploadimage.model.ImageDetails;
+import com.vatsalyadav.uploadimage.view.imageViewFragments.ImageListFragment;
 import com.vatsalyadav.uploadimage.viewmodel.ImageActivityViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class ImageActivity extends AppCompatActivity {
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 1;
@@ -28,30 +28,27 @@ public class ImageActivity extends AppCompatActivity {
     private static final String TAG = "ImageActivity";
     private ImageActivityViewModel imageActivityViewModel;
     private Uri selectedImageUri;
+    private ImageListFragment imageListFragment;
+    private CompositeDisposable firebaseUploadDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
+
+        imageListFragment = new ImageListFragment();
+
+        // Add Fragment to FrameLayout (flContainer), using FragmentManager
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.flContainer, imageListFragment);
+        fragmentTransaction.commit();
+
         initDataBinding();
-        getImagesList();
     }
 
     private void initDataBinding() {
-        imageActivityViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication())).get(ImageActivityViewModel.class);
+        imageActivityViewModel = new ViewModelProvider(this).get(ImageActivityViewModel.class);
         imageActivityViewModel.init();
-    }
-
-    private void getImagesList() {
-        List<ImageDetails> mLiveDataOutput = new ArrayList<>();
-        Observer<Object> mObserver = new Observer<Object>() {
-            @Override
-            public void onChanged(Object o) {
-                mLiveDataOutput.add((ImageDetails) o);
-                Log.e(TAG, "onChanged: " + o.toString());
-            }
-        };
-        imageActivityViewModel.getImagesList().observe(this, mObserver);
     }
 
     public void selectImage(final View view) {
@@ -89,9 +86,9 @@ public class ImageActivity extends AppCompatActivity {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 if (resultCode == RESULT_OK) {
                     selectedImageUri = result.getUri();
-                    imageActivityViewModel.uploadImage(selectedImageUri);
+                    uploadImage();
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Toast.makeText(this, "Problem while cropping image, please try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Problem while selecting image to upload, please try again", Toast.LENGTH_LONG).show();
                 }
             } else if (requestCode == CAMERA_ACTIVITY_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
@@ -100,7 +97,34 @@ public class ImageActivity extends AppCompatActivity {
                 }
             }
         } else {
-            Toast.makeText(this, "Problem while cropping image, please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Problem while selecting image to upload, please try again", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void uploadImage() {
+        Single<String> firebaseUploadSingleObserver = imageActivityViewModel.uploadImage(selectedImageUri);
+        firebaseUploadSingleObserver.subscribe(new SingleObserver<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                firebaseUploadDisposable.add(d);
+            }
+
+            @Override
+            public void onSuccess(String s) {
+                imageListFragment.getImagesList();
+                Toast.makeText(ImageActivity.this, s, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(ImageActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        firebaseUploadDisposable.clear();
     }
 }

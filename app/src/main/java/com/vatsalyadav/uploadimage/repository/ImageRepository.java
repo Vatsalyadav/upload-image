@@ -40,12 +40,6 @@ public class ImageRepository {
 
     private List<ImageDetails> imageDetailsList;
 
-
-//    public MutableLiveData<List<String>> getImageList() {
-//        MutableLiveData<List<String>> data = new MutableLiveData<>();
-//        return data;
-//    }
-
     public void setupFirebase() {
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
         databaseReference = FirebaseDatabase.getInstance().getReference("uploads");
@@ -58,6 +52,8 @@ public class ImageRepository {
                     databaseReference.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            imageDetailsList.clear();
+                            Log.e("Snap", "onDataChange: " + dataSnapshot);
                             for (DataSnapshot imagesSnapshot : dataSnapshot.getChildren()) {
                                 ImageDetails imageDetails = imagesSnapshot.getValue(ImageDetails.class);
                                 imageDetailsList.add(imageDetails);
