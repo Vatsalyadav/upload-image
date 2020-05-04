@@ -1,5 +1,11 @@
 package com.vatsalyadav.uploadimage.repository;
 
+import android.net.Uri;
+
+import java.util.List;
+
+import androidx.lifecycle.MutableLiveData;
+
 public class ImageRepository {
 
     private static ImageRepository instance;
@@ -11,6 +17,12 @@ public class ImageRepository {
         return instance;
     }
 
-    // TODO: Upload image to Firebase
-    // TODO: Fetch images from Firebase
+
+    public MutableLiveData<List<String>> getImageList() {
+        MutableLiveData<List<String>> data = new MutableLiveData<>();
+        return data;
+    }
+
+    public void insertImage(Uri selectedImageUri) {
+    }
 }
