@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -11,9 +12,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.vatsalyadav.uploadimage.R;
+import com.vatsalyadav.uploadimage.model.ImageDetails;
 import com.vatsalyadav.uploadimage.viewmodel.ImageActivityViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 public class ImageActivity extends AppCompatActivity {
@@ -28,11 +34,24 @@ public class ImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
         initDataBinding();
+        getImagesList();
     }
 
     private void initDataBinding() {
-        imageActivityViewModel = new ViewModelProvider(this).get(ImageActivityViewModel.class);
+        imageActivityViewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication())).get(ImageActivityViewModel.class);
         imageActivityViewModel.init();
+    }
+
+    private void getImagesList() {
+        List<ImageDetails> mLiveDataOutput = new ArrayList<>();
+        Observer<Object> mObserver = new Observer<Object>() {
+            @Override
+            public void onChanged(Object o) {
+                mLiveDataOutput.add((ImageDetails) o);
+                Log.e(TAG, "onChanged: " + o.toString());
+            }
+        };
+        imageActivityViewModel.getImagesList().observe(this, mObserver);
     }
 
     public void selectImage(final View view) {
@@ -61,6 +80,7 @@ public class ImageActivity extends AppCompatActivity {
         CropImage.activity(Uri.parse(imageUri))
                 .start(this);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -69,7 +89,7 @@ public class ImageActivity extends AppCompatActivity {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 if (resultCode == RESULT_OK) {
                     selectedImageUri = result.getUri();
-                    imageActivityViewModel.insertImage(selectedImageUri);
+                    imageActivityViewModel.uploadImage(selectedImageUri);
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     Toast.makeText(this, "Problem while cropping image, please try again", Toast.LENGTH_LONG).show();
                 }
@@ -77,10 +97,10 @@ public class ImageActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     String savedImageUri = data.getStringExtra(EXTRA_REPLY);
                     cropImage(savedImageUri);
-                } else if (resultCode == RESULT_CANCELED) {
-                    Toast.makeText(this, "Problem while cropping image, please try again", Toast.LENGTH_LONG).show();
                 }
             }
+        } else {
+            Toast.makeText(this, "Problem while cropping image, please try again", Toast.LENGTH_LONG).show();
         }
     }
 }
