@@ -1,6 +1,7 @@
 package com.vatsalyadav.uploadimage.repository;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.util.List;
 
@@ -24,5 +25,6 @@ public class ImageRepository {
     }
 
     public void insertImage(Uri selectedImageUri) {
+        Log.e("Repository", "insertImage: " + selectedImageUri);
     }
 }
