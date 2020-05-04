@@ -49,7 +49,7 @@ public class ImageGridRecyclerAdapter extends RecyclerView.Adapter<ImageGridRecy
             CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(mContext);
             circularProgressDrawable.setStrokeWidth(10f);
             circularProgressDrawable.setCenterRadius(48f);
-            circularProgressDrawable.setColorSchemeColors(Color.WHITE);
+            circularProgressDrawable.setColorSchemeColors(Color.BLACK);
             circularProgressDrawable.start();
 
             // Set the image using Glide library
@@ -64,35 +64,30 @@ public class ImageGridRecyclerAdapter extends RecyclerView.Adapter<ImageGridRecy
                     .into(viewHolder.gridImage);
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(mContext, "Unable to set NASA pictures grid data, please try again later.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Unable to set Images grid data, please try again later.", Toast.LENGTH_SHORT).show();
         }
 
         try {
-//            final PictureDetailsActivity pictureDetailsActivity = new PictureDetailsActivity();
             viewHolder.gridParentLayout.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-//                    listener.onImageItemSelected(position);
                     ImageDetailFragment imageDetailFragment = new ImageDetailFragment();
-
+                    Log.e("onClick: grid", mImageDetails.get(position).getImageUrl());
                     Bundle args = new Bundle();
-                    args.putInt("position", position);
+                    args.putString("position", mImageDetails.get(position).getImageUrl());
                     imageDetailFragment.setArguments(args);
 
                     ((FragmentActivity) view.getContext()).getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.flContainer, new ImageDetailFragment())
+                            .replace(R.id.flContainer, imageDetailFragment)
                             .addToBackStack(null)
                             .commit();
-//                    Context context = view.getContext();
-//                    Intent intent = pictureDetailsActivity.launchPictureDetails(context, position, mImageDetails);
-//                    context.startActivity(intent, shared_element_container.toBundle());
                 }
             });
         } catch (Exception e) {
             Log.e("PicturesGridRecycler", "Error on launching PictureDetailsActivity");
             e.printStackTrace();
-            Toast.makeText(mContext, "Unable to show selected NASA Picture details, please try again later.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Unable to show fullscreen selected Images, please try again later.", Toast.LENGTH_SHORT).show();
         }
     }
 

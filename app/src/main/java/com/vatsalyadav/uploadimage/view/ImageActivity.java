@@ -15,6 +15,7 @@ import com.vatsalyadav.uploadimage.view.imageViewFragments.ImageListFragment;
 import com.vatsalyadav.uploadimage.viewmodel.ImageActivityViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Single;
@@ -35,15 +36,20 @@ public class ImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
-
-        imageListFragment = new ImageListFragment();
-
-        // Add Fragment to FrameLayout (flContainer), using FragmentManager
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.flContainer, imageListFragment);
-        fragmentTransaction.commit();
-
+        displayToolbar();
+        if (savedInstanceState == null) {
+            imageListFragment = new ImageListFragment();
+            // Add Fragment to FrameLayout (flContainer), using FragmentManager
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.flContainer, imageListFragment);
+            fragmentTransaction.commit();
+        }
         initDataBinding();
+    }
+
+    private void displayToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_images_grid);
+        setSupportActionBar(toolbar);
     }
 
     private void initDataBinding() {
@@ -96,8 +102,6 @@ public class ImageActivity extends AppCompatActivity {
                     cropImage(savedImageUri);
                 }
             }
-        } else {
-            Toast.makeText(this, "Problem while selecting image to upload, please try again", Toast.LENGTH_LONG).show();
         }
     }
 
