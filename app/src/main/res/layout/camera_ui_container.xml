@@ -11,24 +11,36 @@
         android:layout_width="@dimen/round_button_medium"
         android:layout_height="@dimen/round_button_medium"
         android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_xlarge"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:background="@android:color/transparent"
         android:contentDescription="switch_camera_button_alt"
         android:padding="@dimen/spacing_small"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_directions" />
+        app:srcCompat="@drawable/ic_switch" />
 
     <ImageButton
         android:id="@+id/camera_capture_button"
         android:layout_width="@dimen/round_button_large"
         android:layout_height="@dimen/round_button_large"
-        android:layout_marginBottom="@dimen/shutter_button_margin"
-        android:background="@android:drawable/ic_menu_camera"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@drawable/ic_shutter"
         android:contentDescription="capture_button_alt"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageButton
+        android:id="@+id/camera_flash"
+        android:layout_width="@dimen/round_button_medium"
+        android:layout_height="@dimen/round_button_medium"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@drawable/ic_flash_off"
+        android:contentDescription="capture_button_flash"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

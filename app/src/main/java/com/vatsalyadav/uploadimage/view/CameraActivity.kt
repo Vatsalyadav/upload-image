@@ -48,6 +48,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     private var cameraDisplayId: Int = -1
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
+    private var flashMode: Int = ImageCapture.FLASH_MODE_OFF
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
@@ -139,6 +140,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                     .setTargetAspectRatio(screenAspectRatio)
                     .setTargetRotation(rotation)
+                    .setFlashMode(flashMode)
                     .build()
 
             cameraProvider.unbindAll()
@@ -213,6 +215,17 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 CameraSelector.LENS_FACING_BACK
             } else {
                 CameraSelector.LENS_FACING_FRONT
+            }
+            bindCameraUseCases()
+        }
+
+        controls.findViewById<ImageButton>(R.id.camera_flash).setOnClickListener {
+            if (flashMode == ImageCapture.FLASH_MODE_OFF) {
+                flashMode = ImageCapture.FLASH_MODE_ON
+                controls.findViewById<ImageButton>(R.id.camera_flash).setBackgroundResource(R.drawable.ic_flash_on)
+            } else {
+                flashMode = ImageCapture.FLASH_MODE_OFF
+                controls.findViewById<ImageButton>(R.id.camera_flash).setBackgroundResource(R.drawable.ic_flash_off)
             }
             bindCameraUseCases()
         }
