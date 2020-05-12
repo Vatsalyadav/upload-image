@@ -1,5 +1,6 @@
 # Upload and View Image
 Upload and View Image is an Android Application to upload capture photos using CameraX or choose image from gallery and upload to Firebase.
+Phase 2: Include Navigation Component & Data Binding [In Progress]
 
 <br>Upload and View Image App can:
 
