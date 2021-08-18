@@ -148,7 +148,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 camera = cameraProvider.bindToLifecycle(
                         this, cameraSelector, preview, imageCapture)
                 // Attach the viewfinder's surface provider to preview use case
-                preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(camera?.cameraInfo))
+                preview?.setSurfaceProvider(viewFinder.surfaceProvider)
             } catch (exc: Exception) {
                 Log.e("bindCameraUseCases", "Use case binding failed", exc)
             }
@@ -252,6 +252,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 viewFinder.post {
